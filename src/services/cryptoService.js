@@ -2,6 +2,9 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 dotenv.config();
 const BASE_URL='https://api.coinmarketcap.com/data-api/v3/'
+const base_url='https://rest.coinapi.io/v1/exchangerate';
+const apiKey = 'F18C0EEF-68D7-47E3-9AAE-454AE2D2260B'; 
+
 exports.getTop100Cryptos = async () => {
     try {
         const response = await axios.get(`${BASE_URL}cryptocurrency/listing?start=1&limit=100`);
@@ -31,9 +34,13 @@ exports.getTop100Cryptos = async () => {
 
 exports.convertCurrency = async ({ amount, convert_id, id }) => {
   try {
-    const request = `${BASE_URL}tools/price-conversion?amount=${Number(amount)}&convert_id=${Number(convert_id)}&id=${Number(id)}`;
-    const response = await axios.get(request);
-    return response.data;
+    const apiUrl = `${base_url}/${convert_id}/${id}`;
+    const response = await axios.get(apiUrl, {
+      headers: {
+        'X-CoinAPI-Key': apiKey
+      }
+    })
+    return amount * Number(response.data.rate).toFixed(2);
   } catch (error) {
     console.error('Error converting currency:', error.message);
     throw error;
